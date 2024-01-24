@@ -46,11 +46,15 @@ runs:
     - name: Download hadolint and make it available in path
       shell: bash
       run: |
-        echo "::debug::Downloading Hadolint ${{ inputs.version }}"
-        mkdir -p ${{ github.action_path }}/bin
-        curl -L -s -o ${{ github.action_path }}/bin/hadolint \
-          "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version }}/hadolint-Linux-x86_64"
-        chmod +x ${{ github.action_path }}/bin/hadolint
+        if [ ! -f "${{ github.action_path }}/bin/hadolint" ]; then
+          echo "::debug::Downloading Hadolint ${{ inputs.version }}"
+          mkdir -p ${{ github.action_path }}/bin
+          curl -L -s -o ${{ github.action_path }}/bin/hadolint \
+            "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version }}/hadolint-Linux-x86_64"
+          chmod +x ${{ github.action_path }}/bin/hadolint
+        else
+          echo "::debug::Hadolint exists, skipping download"
+        fi
         echo "${{ github.action_path }}/bin" >> "${GITHUB_PATH}"
     - name: Invoke hadolint.sh
       id: run
