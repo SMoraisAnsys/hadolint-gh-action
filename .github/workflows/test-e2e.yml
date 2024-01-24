@@ -41,3 +41,28 @@ jobs:
         with:
           dockerfile: "test/**/Dockerfile-glob-*"
           annotate: false
+  gh-action-mutltiple-invoke:
+    name: Action supports multiple invoke in a row
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      # Download and run default version
+      - uses: ./
+        with:
+          dockerfile: test/fixtures/Dockerfile-valid
+      # Download and run custom version
+      - uses: ./
+        with:
+          dockerfile: test/fixtures/Dockerfile-valid
+          version: 2.9.0
+      - run: chmod -x ${{ github.workspace }}/bin/hadolint
+      # Download and run custom version
+      - uses: ./
+        with:
+          dockerfile: test/fixtures/Dockerfile-valid
+          version: 2.9.0
+      # Run custom version
+      - uses: ./
+        with:
+          dockerfile: test/fixtures/Dockerfile-valid
+          version: 2.9.0
