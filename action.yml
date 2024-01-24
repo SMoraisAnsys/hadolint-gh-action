@@ -46,14 +46,34 @@ runs:
     - name: Download hadolint and make it available in path
       shell: bash
       run: |
+        download_hadolint=false
+        # Check if hadolint exists
         if [ ! -f "${{ github.action_path }}/bin/hadolint" ]; then
-          echo "::debug::Downloading Hadolint ${{ inputs.version }}"
+          echo "::debug::Hadolint binary not found"
           mkdir -p ${{ github.action_path }}/bin
+          download_hadolint=true
+        else
+          echo "::debug::Hadolint binary exists"
+          version=$(${{ github.action_path }}/bin/hadolint --version 2>&1)
+          # Check if hadolint could be executed
+          if [ $? -ne 0 ]; then
+            echo "::debug::Hadolint could not be executed"
+            download_hadolint=true
+          else
+            # Extract version number
+            version=$(echo "$version" | awk '{print $NF}')
+            if [ "$version" != "${{ inputs.version }}" ]; then
+              echo "::debug::Hadolint version does not match input version ($version != ${{ inputs.version }})"
+              download_hadolint=true
+            fi
+          fi
+        fi
+        # Download hadolint if necessary
+        if [ "$download_hadolint" = true ]; then
+          echo "::debug::Downloading Hadolint ${{ inputs.version }}"
           curl -L -s -o ${{ github.action_path }}/bin/hadolint \
             "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version }}/hadolint-Linux-x86_64"
           chmod +x ${{ github.action_path }}/bin/hadolint
-        else
-          echo "::debug::Hadolint exists, skipping download"
         fi
         echo "${{ github.action_path }}/bin" >> "${GITHUB_PATH}"
     - name: Invoke hadolint.sh
