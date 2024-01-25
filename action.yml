@@ -50,14 +50,13 @@ runs:
         # Check if hadolint exists
         if [ ! -x "${{ github.action_path }}/bin/hadolint" ]; then
           echo "::debug::Hadolint binary not found"
-          mkdir -p ${{ github.action_path }}/bin
           download_hadolint=true
         else
           echo "::debug::Hadolint binary exists"
           version=$(${{ github.action_path }}/bin/hadolint --version 2>&1)
-          # Check if hadolint could be executed
+          # Check if hadolint version can be retrieved
           if [ $? -ne 0 ]; then
-            echo "::debug::Hadolint could not be executed"
+            echo "::debug::Hadolint version cannot be retrieved"
             download_hadolint=true
           else
             # Extract version number
@@ -71,6 +70,7 @@ runs:
         # Download hadolint if necessary
         if [ "$download_hadolint" = true ]; then
           echo "::debug::Downloading Hadolint ${{ inputs.version }}"
+          mkdir -p ${{ github.action_path }}/bin
           curl -L -s -o ${{ github.action_path }}/bin/hadolint \
             "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version }}/hadolint-Linux-x86_64"
           chmod +x ${{ github.action_path }}/bin/hadolint
