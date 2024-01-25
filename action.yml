@@ -48,7 +48,7 @@ runs:
       run: |
         download_hadolint=false
         # Check if hadolint exists
-        if [ ! -f "${{ github.action_path }}/bin/hadolint" ]; then
+        if [ ! -x "${{ github.action_path }}/bin/hadolint" ]; then
           echo "::debug::Hadolint binary not found"
           mkdir -p ${{ github.action_path }}/bin
           download_hadolint=true

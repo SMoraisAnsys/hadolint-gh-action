@@ -42,7 +42,7 @@ jobs:
           dockerfile: "test/**/Dockerfile-glob-*"
           annotate: false
   gh-action-mutltiple-invoke:
-    name: Action supports multiple invoke in a row
+    name: Action supports multiple invocations in a job
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
